@@ -28,7 +28,7 @@ export const getReducers = (modules) => (modules.reduce(
     )
 );
 
-export const connectContainer = (module) => (Component) => {
+const connectContainer = (module) => (Component) => {
     console.log(module);
     return c(
         selectModule(module),
