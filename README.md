@@ -25,10 +25,10 @@ const types = createTypes(name)({
     ADD_USER: 'ADD_USER'
 });
 
-const initial = [];
+const initial = {users: []};
 
 const mutations = {
-    [types.ADD_USER]: (state, {payload}) => (state.push(payload)),
+    [types.ADD_USER]: (state, {payload}) => (state.users.push(payload)),
 };
 
 const actions = {
@@ -49,7 +49,7 @@ export default createContainer(module);
 import {module as userModule} from './user';
 
 const moduleReducers = getReducers([
-    navModule,
+    userModule,
 ]);
 
 const reducers = {
@@ -84,6 +84,7 @@ import {module as userModule} from 'src/store/user';
 class SomeComponent extends React.Component {
   render() {
     const {user} = this.props;
+    const {users, addUser} = user;
     return (
       //component code
     )
@@ -97,14 +98,14 @@ import UserModule from 'src/store/user';
 
 const SomeComponent = () => (
   <UserModule>
-    {(users)=>(
-
+    {({users, addUser})=>(
+      <div>
+        {users.map((user)=>(
+          <span>{user.name}</span>
+        ))}
+        <button onClick={()=>(addUser({name: 'Jimmy'}))}>
+      </div>
     )}
   </UserModule>
 )
-
-
-See [sample](https://github.com/alexghenderson/formik-field/blob/master/sample/src/App.js) for format and normalize
-
-## Tips
-Make a snippet for this. 
+```
