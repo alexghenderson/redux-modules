@@ -1,2 +1,3 @@
 *
 !dist/*
+!saga/package.json

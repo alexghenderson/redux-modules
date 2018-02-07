@@ -29,7 +29,6 @@ export const getReducers = (modules) => (modules.reduce(
 );
 
 const connectContainer = (module) => (Component) => {
-    console.log(module);
     return c(
         selectModule(module),
         (dispatch) => dispatchModule(module, dispatch),
@@ -81,43 +80,5 @@ export const createTypes = (name) => (types) => (Object.keys(types).reduce(
 ));
 
 export const createAction = (type, pc) => (props) => ({type, payload: pc && pc.call ? pc(props) : pc});
-
-const createSagas = ({all, takeEvery}) => (module) => {
-
-    return function*() {
-        if(module.sagas) {
-            yield all(Object.keys(module.sagas).map(
-                (name)=>(
-                    takeEvery(name, module.sagas[name])
-                )
-            ))
-        }
-    }
-};
-
-export const getSagas = ({takeEvery, all}) => (modules) => {
-    if(!all || !all.call || !takeEvery || !takeEvery.call) {
-        throw new Error('getSagas {takeEvery, all} parameters must be provided');
-    }
-    if(!Array.isArray(modules)) {
-        throw new Error('getSagas modules parameter must be an array');
-    }
-    const createModuleSaga = createSagas({takeEvery, all});
-    return modules.map((module)=>(createModuleSaga((module))));
-}
-
-export const createRootSaga = ({fork, all}) => (sagas) => {
-    if(!all || !all.call || !fork || !fork.call) {
-        throw new Error('getSagas {all, fork} parameters must be provided');
-    }
-    if(!Array.isArray(sagas)) {
-        throw new Error('createRootSaga sagas parameter must be an array');
-    }
-    return function*() {
-        yield all(
-            sagas.map((saga)=>(fork(saga)))
-        );
-    }
-}
 
 export const identity = (i) => (i);

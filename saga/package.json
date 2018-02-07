@@ -1,0 +1,5 @@
+{
+    "name": "@alexghenderson/redux-modules/saga",
+    "private": true,
+    "main": "../dist/saga.js"
+  }

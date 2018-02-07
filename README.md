@@ -1,5 +1,5 @@
 ## Overview
-Heavily inspired by redux-box, some of the ideas and methodology is shamelessly ripped from it. However, redux-modules allows easier integration into existing code. Unlike redux-box, it does not require a custom store creator and does not provide sagas (although this may be added in the future).
+Heavily inspired by redux-box, some of the ideas and methodology is shamelessly ripped from it. However, redux-modules allows easier integration into existing code. Unlike redux-box, it does not require a custom store creator, or any special code. It simply generates a map of reducers, sagas, and tools for connecting the modules to components.
 
 ## Installation
 Install react, redux, and react-redux:
@@ -28,11 +28,18 @@ const types = createTypes(name)({
 const initial = {users: []};
 
 const mutations = {
-    [types.ADD_USER]: (state, {payload}) => (state.users.push(payload)),
+    [types.ADD_USER]: (state, {payload}) => {state.users.push(payload)},
 };
 
 const actions = {
     addUser: createAction(types.ADD_USER),
+};
+
+/* Optional: */
+const sagas = {
+  [types.ADD_USER]: function* (action) {
+    yield call(window.alert, `Added user ${action.payload.name}`);
+  },
 };
 
 export const module = {
@@ -60,16 +67,34 @@ const reducers = {
 export default reducers;
 ```
 
+`src/store/sagas.js`
+```js
+import {getSagas, createRootSaga} from '@alexghenderson/redux-modules/saga';
+import {module as userModule} from './user';
+const moduleSagas = getSagas([usersModule]);
+
+const sagas = [
+    ...moduleSagas,
+    //Any other sagas
+];
+
+export default createRootSaga(sagas);
+```
+
 `src/store/index.js`
 ```js
 import {createStore} from 'redux';
+import createSagaMiddleware from 'redux-saga'; //optional
 
+import saga from './sagas';
 import reducers from './reducers';
 
 export default () => {
-    const store = createStore(reducers, {});
+  const sagaMiddleware = createSagaMiddleware(); //optional
+  const store = createStore(reducers, sagaMiddleware/* optional */);
+  sagaMiddleware.run(saga); //optional
 
-    return store;
+  return store;
 };
 ```
 
@@ -116,6 +141,7 @@ Modules are defined as an object with the following keys:
 * `initial` The initial state of the module. Note: redux-modules only supports objects for module states.
 * `mutations` The mutations that form the reducer. An object with the action types as the keys, and functions that transform the state as values. Note: redux-modules uses immer to maintain immutability. You can mutate the state here, it is actually a proxy so the real state isn't modified.
 * `actions` The actions for the module. An object with the action names for keys and the action creators for the values. Redux-modules provides a `createAction` utility to make defining the actions a bit cleaner.
+* `sagas` Sagas for the module. An object with the action type for the key and the generator function for the values. Optional.
 
 ## Utility Functions
 * `createTypes(moduleName)(typeMap)` Creates a type map for namespacing types. Not required, but recommended to prevent type name collisions.
@@ -123,3 +149,8 @@ Modules are defined as an object with the following keys:
 * `getReducers(moduleList)` Creates an object with the module names for keys and the reducer functions for values. Used to generate reducers that can be passed to combineReducers.
 * `createContainer(module)` Creates a connected function-as-a-child component for a specified module.
 * `connect(moduleMap)` Like react-redux connect, except takes an object with the names of the props for keys, and the modules for values. Will intelligently map the actions and state to the prop names provided. Used for creating higher-order-components.
+
+## Saga Utility function
+Note: These are exports from `@alexghenderson/redux-modules/saga`
+* `getSagas(moduleList)` Returns an array of sagas for each module.
+* `createRootSaga(sagasList)` Creates a root saga to pass to sagaMiddleware.run(). Takes an array of sagas as a parameter (which can be created from getSagas).
