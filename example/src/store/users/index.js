@@ -1,4 +1,5 @@
 import {createTypes, createAction, createContainer} from '@alexghenderson/redux-modules';
+import {call} from 'redux-saga/effects';
 
 const name = 'users';
 
@@ -16,11 +17,18 @@ const actions = {
     addUser: createAction(types.ADD_USER, (user)=>({name: user.name})),
 };
 
+const sagas = {
+    [types.ADD_USER]: function*(action) {
+        yield call(window.alert, `Added user ${action.payload.name}`);
+    },
+}
+
 export const module = {
     name,
     initial,
     mutations,
     actions,
+    sagas,
 };
 
 export default createContainer(module);
