@@ -1,0 +1,22 @@
+{
+  "name": "@alexghenderson/redux-modules",
+  "version": "1.0.0",
+  "description": "Redux minus a lot of boilerplate",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rm -rf dist && babel src -d dist ",
+    "prepare": "npm run build"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0"
+  },
+  "peerDependencies": {
+    "react-redux": "^5.0.6"
+  },
+  "dependencies": {
+    "immer": "^1.0.1"
+  }
+}
