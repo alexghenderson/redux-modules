@@ -1,3 +1,4 @@
+import polyfill from 'babel-polyfill'
 import {connect as c} from 'react-redux';
 import produce from 'immer';
 
